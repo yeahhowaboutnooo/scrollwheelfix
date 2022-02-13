@@ -19,5 +19,6 @@ A small plugin which allows zooming via scroll wheel during object animations
 git clone https://github.com/yeahhowaboutnooo/scrollwheelfix
 cd scrollwheelfix
 git submodule update --init --recursive
+patch --binary -p1 -i commonlib.patch
 cmake -B build -S .
 ```

@@ -1,0 +1,13 @@
+diff --git a/extern/CommonLibSSE/include/SKSE/Trampoline.h b/extern/CommonLibSSE/include/SKSE/Trampoline.h
+index 819d3dd..0ac3e7b 100644
+--- a/extern/CommonLibSSE/include/SKSE/Trampoline.h
++++ b/extern/CommonLibSSE/include/SKSE/Trampoline.h
+@@ -232,7 +232,7 @@ namespace SKSE
+ 			}
+ 
+ 			const auto disp =
+-				reinterpret_cast<const std::byte*>(mem) -
++				reinterpret_cast<const std::byte*>(_data) -
+ 				reinterpret_cast<const std::byte*>(a_src + sizeof(SrcAssembly));
+ 			if (!in_range(disp)) {  // the trampoline should already be in range, so this should never happen
+ 				stl::report_and_fail("displacement is out of range"sv);
