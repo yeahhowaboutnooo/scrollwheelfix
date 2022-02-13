@@ -8,8 +8,7 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a
 		return false;
 	}
 
-	*path /= Version::PROJECT;
-	*path += ".log"sv;
+	*path /= fmt::format("{}.log"sv, Version::PROJECT);
 	auto sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(path->string(), true);
 #endif
 
@@ -19,13 +18,13 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a
 	log->set_level(spdlog::level::trace);
 #else
 	log->set_level(spdlog::level::info);
-	log->flush_on(spdlog::level::warn);
+	log->flush_on(spdlog::level::info);
 #endif
 
 	spdlog::set_default_logger(std::move(log));
-	spdlog::set_pattern("%g(%#): [%^%l%$] %v"s);
+	spdlog::set_pattern("%s(%#): [%^%l%$] %v"s);
 
-	logger::info(FMT_STRING("{} v{}"), Version::PROJECT, Version::NAME);
+	logger::info(FMT_STRING("{} v{}"sv), Version::PROJECT, Version::NAME);
 
 	a_info->infoVersion = SKSE::PluginInfo::kVersion;
 	a_info->name = Version::PROJECT.data();
@@ -47,7 +46,7 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a
 
 extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_skse)
 {
-	logger::info("loaded");
+	logger::info("{} loaded"sv, Version::PROJECT);
 
 	SKSE::Init(a_skse);
 
@@ -81,13 +80,15 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 
 	//erase the original instruction with nops
 	std::vector<std::uint8_t> nops(orig.getSize());
-	std::fill(nops.begin(), nops.end(), 0x90);
+	std::fill(nops.begin(), nops.end(), (std::uint8_t)0x90);
 	REL::safe_write<std::uint8_t>(injectionPoint, nops);
 
 	//writes:
 	//jmp from injectionPoint -> start_InjectedCode
 	//jmp from end_InjectedCode -> injectionPoint+org.getSize()
 	trampolin.write_branch<5>(injectionPoint, injectionPoint+orig.getSize());
+
+	logger::info("fixed scroll wheel zoom during object animations!");
 
 	return true;
 }
