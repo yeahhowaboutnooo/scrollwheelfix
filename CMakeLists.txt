@@ -80,11 +80,14 @@ add_compile_definitions(SKSE_SUPPORT_XBYAK)
 
 # ---- Dependencies ----
 
+find_path(XBYAK_INCLUDE_DIRS "xbyak/xbyak.h" HINTS "extern/xbyak")
+include_directories(
+	${XBYAK_INCLUDE_DIRS}
+)
+
 add_subdirectory("extern/CommonLibSSE" CommonLibSSE)
 
 find_package(spdlog REQUIRED CONFIG)
-find_path(XBYAK_INCLUDE_DIRS "xbyak/xbyak.h")
-
 # ---- Add source files ----
 
 set(SOURCES
@@ -129,7 +132,6 @@ target_include_directories(
 	PRIVATE
 		${CMAKE_CURRENT_BINARY_DIR}/include
 		${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${XBYAK_INCLUDE_DIRS}
 )
 
 target_link_libraries(
@@ -175,7 +177,7 @@ if (MSVC)
 			/external:W0
 
 			/W4	# Warning level
-			/WX	# Warning level (warnings are errors)
+			#/WX	# Warning level (warnings are errors)
 
 			"$<$<CONFIG:DEBUG>:>"
 			"$<$<CONFIG:RELEASE>:/Zc:inline;/JMC-;/Ob3>"
