@@ -90,15 +90,21 @@ add_subdirectory("extern/CommonLibSSE" CommonLibSSE)
 find_package(spdlog REQUIRED CONFIG)
 # ---- Add source files ----
 
-set(SOURCES
-	src/main.cpp
+set(HEADERS
 	src/PCH.h
+	src/Hooks.h
+)
+
+set(SOURCES
+	src/Hooks.cpp
+	src/main.cpp
 )
 
 source_group(
 	TREE
 		${CMAKE_CURRENT_SOURCE_DIR}
 	FILES
+		${HEADERS}
 		${SOURCES}
 )
 
@@ -114,6 +120,7 @@ source_group(
 add_library(
 	${PROJECT_NAME}
 	SHARED
+	${HEADERS}
 	${SOURCES}
 	${CMAKE_CURRENT_BINARY_DIR}/include/Version.h
 	${CMAKE_CURRENT_BINARY_DIR}/version.rc

@@ -1,3 +1,5 @@
+#include "Hooks.h"
+
 extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Query(const SKSE::QueryInterface* a_skse, SKSE::PluginInfo* a_info)
 {
 #ifndef NDEBUG
@@ -50,45 +52,7 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 
 	SKSE::Init(a_skse);
 
-	auto moduleBase = REL::Module::get().base();
-	auto injectionPoint = moduleBase + 0xc119d8;
-	auto &trampolin = SKSE::GetTrampoline();
-	trampolin.create(32, (void*)injectionPoint);
-
-	struct OrigCode : Xbyak::CodeGenerator
-	{
-		OrigCode()
-		{
-			mov(eax, qword[rax + 0x118]);
-		}
-	};
-	OrigCode orig;
-	orig.ready();
-
-	struct DeleteBit6 : Xbyak::CodeGenerator
-	{
-		DeleteBit6()
-		{
-			and_(cl, 0xdf); //delete bit #6
-		}
-	};
-	DeleteBit6 db6;
-	db6.ready();
-
-	trampolin.allocate(orig);
-	trampolin.allocate(db6);
-
-	//erase the original instruction with nops
-	std::vector<std::uint8_t> nops(orig.getSize());
-	std::fill(nops.begin(), nops.end(), (std::uint8_t)0x90);
-	REL::safe_write<std::uint8_t>(injectionPoint, nops);
-
-	//writes:
-	//jmp from injectionPoint -> start_InjectedCode
-	//jmp from end_InjectedCode -> injectionPoint+org.getSize()
-	trampolin.write_branch<5>(injectionPoint, injectionPoint+orig.getSize());
-
-	logger::info("fixed scroll wheel zoom during object animations!");
+	Hooks::Install();
 
 	return true;
 }
