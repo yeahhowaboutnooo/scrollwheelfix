@@ -1,6 +1,0 @@
-[submodule "extern/CommonLibSSE"]
-	path = extern/CommonLibSSE
-	url = https://github.com/Ryan-rsm-McKenzie/CommonLibSSE
-[submodule "extern/xbyak"]
-	path = extern/xbyak
-	url = https://github.com/herumi/xbyak.git
